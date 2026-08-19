@@ -1,0 +1,4 @@
+@media (max-width: 1000px) {
+  .issuance-layout { grid-template-columns: 1fr; }
+  .issuance-summary { margin-top: 0; }
+}
