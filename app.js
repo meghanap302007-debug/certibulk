@@ -16,6 +16,26 @@ const views = [...document.querySelectorAll('.view')];
 const navItems = [...document.querySelectorAll('.nav-item')];
 const pageContext = document.querySelector('#page-context');
 const toast = document.querySelector('#toast');
+const authGate = document.querySelector('#auth-gate');
+const protectedViews = new Set(['dashboard', 'issuance', 'designer', 'templates', 'roster', 'dispatch', 'emails']);
+let signedInEmail = localStorage.getItem('certibulk_signed_in_email');
+
+function isSignedIn() {
+  return Boolean(signedInEmail);
+}
+
+function setSignedIn(email) {
+  signedInEmail = email;
+  localStorage.setItem('certibulk_signed_in_email', email);
+  authGate.hidden = true;
+}
+
+function signOut() {
+  signedInEmail = '';
+  localStorage.removeItem('certibulk_signed_in_email');
+  authGate.hidden = false;
+  navigate('dashboard');
+}
 
 function showToast(message) {
   toast.textContent = message;
@@ -25,6 +45,10 @@ function showToast(message) {
 }
 
 function navigate(viewName) {
+  if (protectedViews.has(viewName) && !isSignedIn()) {
+    authGate.hidden = false;
+    return;
+  }
   if (viewName === 'help') {
     showToast('Documentation is coming soon. Your dispatch guide will live here.');
     return;
@@ -45,6 +69,20 @@ document.addEventListener('click', event => {
     navigate(trigger.dataset.view);
   }
 });
+
+document.querySelector('#sign-in-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const email = document.querySelector('#auth-email').value.trim();
+  const password = document.querySelector('#auth-password').value;
+  if (!email || password.length < 6) {
+    showToast('Enter a valid email and a password with at least 6 characters.');
+    return;
+  }
+  setSignedIn(email);
+  navigate(window.location.hash.replace('#', '') || 'dashboard');
+  showToast(`Signed in as ${email}. Certificate generation is unlocked.`);
+});
+document.querySelector('#sign-out').addEventListener('click', signOut);
 
 function renderRecipients(filter = '') {
   const rows = document.querySelector('#recipient-rows');
@@ -102,6 +140,11 @@ async function sendToRecipient(email, name) {
 }
 
 async function startDispatch() {
+  if (!isSignedIn()) {
+    authGate.hidden = false;
+    showToast('Sign in before generating or sending certificates.');
+    return;
+  }
   if (dispatchStarted) {
     showToast(`All ${recipients.length} certificates are already delivered.`);
     return;
@@ -241,4 +284,9 @@ document.querySelectorAll('[data-design-style]').forEach(button => button.addEve
 renderRecipients();
 renderDispatch();
 const startingView = window.location.hash.replace('#', '');
-if (startingView && document.querySelector(`#${startingView}.view`)) navigate(startingView);
+if (isSignedIn()) {
+  authGate.hidden = true;
+  if (startingView && document.querySelector(`#${startingView}.view`)) navigate(startingView);
+} else {
+  authGate.hidden = false;
+}
