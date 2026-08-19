@@ -62,8 +62,15 @@ function renderDispatch() {
   rows.innerHTML = recipients.map(recipient => `
     <div class="table-row">
       <span class="recipient-cell"><i class="row-avatar">${recipient.initials}</i><span><strong>${recipient.name}</strong><small>${recipient.email}</small></span></span>
-      <span>${recipient.id}</span><span class="status ${dispatchStarted ? 'sent' : ''}">${dispatchStarted ? 'Delivered' : 'Queued'}</span><button class="row-action">${dispatchStarted ? 'Download ↓' : 'Preview ↗'}</button>
+      <span>${recipient.id}</span><span class="status ${dispatchStarted ? 'sent' : ''}">${dispatchStarted ? 'Delivered' : 'Queued'}</span><button class="row-action" data-send-to="${recipient.email}" data-recipient="${recipient.name}">${dispatchStarted ? 'Email ↗' : 'Send email ↗'}</button>
     </div>`).join('');
+}
+
+function sendToRecipient(email, name) {
+  const subject = encodeURIComponent('Your certificate from JAIVA Creative Labs');
+  const body = encodeURIComponent(`Hi ${name},\n\nCongratulations on completing your internship with JAIVA Creative Labs. Your certificate is ready.\n\nKeep building,\nArjun`);
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  showToast(`Opening a message addressed to ${email}.`);
 }
 
 function startDispatch() {
@@ -143,6 +150,10 @@ document.querySelector('#recipient-rows').addEventListener('click', event => {
   const button = event.target.closest('[data-email]');
   if (button) showToast(`Certificate recipient: ${button.dataset.email}`);
 });
+document.querySelector('#dispatch-rows').addEventListener('click', event => {
+  const button = event.target.closest('[data-send-to]');
+  if (button) sendToRecipient(button.dataset.sendTo, button.dataset.recipient);
+});
 document.querySelectorAll('.template-option').forEach(option => option.addEventListener('click', () => {
   document.querySelectorAll('.template-option').forEach(item => item.classList.remove('selected'));
   option.classList.add('selected');
@@ -150,6 +161,34 @@ document.querySelectorAll('.template-option').forEach(option => option.addEventL
   const target = document.querySelector('#selected-template');
   if (target) target.textContent = selected;
   showToast(`${selected} template selected.`);
+}));
+
+const designFields = [
+  ['design-title', 'preview-title'],
+  ['design-org', 'preview-org'],
+  ['design-signer', 'preview-signer']
+];
+designFields.forEach(([fieldId, previewId]) => {
+  document.querySelector(`#${fieldId}`).addEventListener('input', event => {
+    document.querySelector(`#${previewId}`).textContent = event.target.value;
+  });
+});
+document.querySelector('#design-color').addEventListener('input', event => {
+  document.querySelector('#certificate-preview').style.setProperty('--certificate-accent', event.target.value);
+});
+document.querySelector('#save-design').addEventListener('click', () => showToast('Certificate design saved to this campaign.'));
+document.querySelector('#add-qr').addEventListener('click', () => {
+  document.querySelector('#qr-placeholder').classList.toggle('visible');
+  showToast('Verification QR toggled on the certificate.');
+});
+document.querySelector('#add-signature').addEventListener('click', () => {
+  document.querySelector('#preview-signer').classList.toggle('signature-style');
+  showToast('Signature style toggled.');
+});
+document.querySelectorAll('[data-design-style]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-design-style]').forEach(item => item.classList.remove('active'));
+  button.classList.add('active');
+  document.querySelector('#certificate-preview').dataset.style = button.dataset.designStyle;
 }));
 
 renderRecipients();

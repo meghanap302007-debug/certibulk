@@ -2,3 +2,34 @@
   .issuance-layout { grid-template-columns: 1fr; }
   .issuance-summary { margin-top: 0; }
 }
+
+.designer-layout { display: grid; grid-template-columns: 300px 1fr; gap: 17px; }
+.design-controls label { display: block; color: #73827d; font-size: 11px; font-weight: 600; margin-bottom: 15px; }
+.design-controls input:not([type="color"]) { display: block; width: 100%; border: 1px solid var(--line); border-radius: 5px; padding: 11px; margin-top: 7px; font: 12px inherit; color: var(--ink); outline-color: var(--green); }
+.design-controls input[type="color"] { display: block; width: 100%; height: 36px; border: 1px solid var(--line); border-radius: 5px; margin-top: 7px; background: white; cursor: pointer; }
+.control-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.saved-state { color: #4b9a76; font-size: 10px; }
+.designer-options, .designer-tools { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 19px; }
+.designer-tools { border-top: 1px solid var(--line); padding-top: 18px; }
+.certificate-stage { min-height: 520px; background: #eef3ef; }
+.editable-certificate { --certificate-accent: #2c8068; max-width: 720px; min-height: 390px; margin: 25px auto 0; background: #e2f0e8; border: 12px solid #c5dfd2; outline: 1px solid var(--certificate-accent); outline-offset: -22px; color: var(--certificate-accent); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 55px 35px; text-align: center; transition: background .2s, color .2s; }
+.editable-certificate[data-style="formal"] { background: #eee7d7; color: #806744; border-color: #dacbae; }
+.editable-certificate[data-style="playful"] { background: #f5e7c9; color: #b35e42; border-color: #ebc99c; }
+.certificate-seal { position: absolute; top: 28px; font: 700 11px 'Space Grotesk'; border: 1px solid currentColor; border-radius: 50%; padding: 9px 7px; }
+.editable-certificate em { font: 9px 'DM Sans'; letter-spacing: 2px; }
+.editable-certificate h2 { font: 600 33px 'Space Grotesk'; margin: 12px 0; }
+.editable-certificate strong { font: italic 18px Georgia; font-weight: 400; }
+.editable-certificate p { font-size: 11px; color: currentColor; opacity: .7; }
+.certificate-meta { display: flex; gap: 60px; border-top: 1px solid currentColor; margin-top: 28px; padding-top: 10px; font-size: 10px; }
+.certificate-id { position: absolute; bottom: 20px; font-size: 8px; letter-spacing: 1px; opacity: .7; }
+.qr-placeholder { position: absolute; right: 31px; bottom: 19px; opacity: 0; border: 1px solid currentColor; padding: 6px; font-size: 18px; transition: opacity .2s; }
+.qr-placeholder.visible { opacity: .75; }
+.signature-style { font-family: cursive; font-style: italic; }
+
+@media (max-width: 700px) {
+  .designer-layout { grid-template-columns: 1fr; }
+  .certificate-stage { min-height: 430px; }
+  .editable-certificate { min-height: 290px; padding: 35px 20px; }
+  .editable-certificate h2 { font-size: 24px; }
+  .certificate-meta { gap: 20px; }
+}
