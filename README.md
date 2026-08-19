@@ -10,6 +10,7 @@ A lightweight certificate operations workspace inspired by the Certificate Bulke
 - Email composer with mobile preview
 - Certificate dispatch tracker with delivery progress
 - Responsive desktop and mobile layouts
+- Server-side PDF generation and Resend email delivery endpoint
 
 ## Run locally
 
@@ -19,4 +20,11 @@ Open `index.html` directly, or serve the folder with any static web server.
 npx serve .
 ```
 
-The current browser implementation simulates dispatch. Production email delivery requires a server-side provider such as Resend, SendGrid, or SMTP so credentials are not exposed in the browser.
+## Enable real delivery
+
+The Vercel function at `/api/send-certificate` generates a PDF and sends it to the exact recipient email. Add these environment variables in the Vercel project:
+
+- `RESEND_API_KEY`: your Resend API key
+- `CERTIFICATE_FROM_EMAIL`: a verified sender, such as `CertiBulk <certificates@yourdomain.com>`
+
+Without those variables, the app reports that delivery is not configured instead of pretending an email was sent.

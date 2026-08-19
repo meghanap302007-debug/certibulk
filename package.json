@@ -7,5 +7,9 @@
   },
   "devDependencies": {
     "serve": "^14.2.0"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "resend": "^6.20.0"
   }
 }

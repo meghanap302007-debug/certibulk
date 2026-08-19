@@ -9,6 +9,7 @@ let recipients = [
 ];
 let currentView = 'dashboard';
 let dispatchStarted = false;
+const deliveredRecipients = new Set();
 let toastTimer;
 
 const views = [...document.querySelectorAll('.view')];
@@ -62,23 +63,49 @@ function renderDispatch() {
   rows.innerHTML = recipients.map(recipient => `
     <div class="table-row">
       <span class="recipient-cell"><i class="row-avatar">${recipient.initials}</i><span><strong>${recipient.name}</strong><small>${recipient.email}</small></span></span>
-      <span>${recipient.id}</span><span class="status ${dispatchStarted ? 'sent' : ''}">${dispatchStarted ? 'Delivered' : 'Queued'}</span><button class="row-action" data-send-to="${recipient.email}" data-recipient="${recipient.name}">${dispatchStarted ? 'Email ↗' : 'Send email ↗'}</button>
+      <span>${recipient.id}</span><span class="status ${deliveredRecipients.has(recipient.email) ? 'sent' : ''}">${deliveredRecipients.has(recipient.email) ? 'Delivered' : 'Queued'}</span><button class="row-action" data-send-to="${recipient.email}" data-recipient="${recipient.name}">${deliveredRecipients.has(recipient.email) ? 'Resend ↗' : 'Send email ↗'}</button>
     </div>`).join('');
 }
 
-function sendToRecipient(email, name) {
-  const subject = encodeURIComponent('Your certificate from JAIVA Creative Labs');
-  const body = encodeURIComponent(`Hi ${name},\n\nCongratulations on completing your internship with JAIVA Creative Labs. Your certificate is ready.\n\nKeep building,\nArjun`);
-  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  showToast(`Opening a message addressed to ${email}.`);
+function certificatePayload(email, name) {
+  return {
+    recipientEmail: email,
+    recipientName: name,
+    certificateId: recipients.find(recipient => recipient.email === email)?.id,
+    title: document.querySelector('#design-title')?.value || 'Certificate of excellence',
+    organization: document.querySelector('#design-org')?.value || 'JAIVA Creative Labs',
+    signer: document.querySelector('#design-signer')?.value || 'Arjun Kumar'
+  };
 }
 
-function startDispatch() {
+async function deliverCertificate(email, name) {
+  const response = await fetch('/api/send-certificate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(certificatePayload(email, name))
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || 'Certificate delivery failed.');
+  deliveredRecipients.add(email);
+  renderDispatch();
+  return result;
+}
+
+async function sendToRecipient(email, name) {
+  try {
+    showToast(`Sending certificate to ${email}...`);
+    await deliverCertificate(email, name);
+    showToast(`Certificate PDF sent to ${email}.`);
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
+async function startDispatch() {
   if (dispatchStarted) {
-    showToast('All 7 certificates are already delivered.');
+    showToast(`All ${recipients.length} certificates are already delivered.`);
     return;
   }
-  dispatchStarted = true;
   const button = document.querySelector('#send-certificates');
   button.disabled = true;
   button.textContent = 'Sending...';
@@ -86,19 +113,27 @@ function startDispatch() {
   const label = document.querySelector('#progress-label');
   const queue = document.querySelector('#queue-status');
   let complete = 0;
-  const timer = setInterval(() => {
-    complete += 1;
+  for (const recipient of recipients) {
+    try {
+      await deliverCertificate(recipient.email, recipient.name);
+      complete += 1;
+    } catch (error) {
+      showToast(`${recipient.email}: ${error.message}`);
+    }
     bar.style.width = `${Math.round((complete / recipients.length) * 100)}%`;
     label.textContent = `${Math.round((complete / recipients.length) * 100)}% · ${complete} of ${recipients.length} completed`;
-    queue.textContent = complete === recipients.length ? '7 delivered' : `${recipients.length - complete} queued`;
-    if (complete === recipients.length) {
-      clearInterval(timer);
-      button.textContent = '✓ Certificates sent';
-      button.classList.add('sent');
-      renderDispatch();
-      showToast('Dispatch complete. 7 certificates delivered successfully.');
-    }
-  }, 280);
+    queue.textContent = complete === recipients.length ? `${recipients.length} delivered` : `${recipients.length - complete} queued`;
+  }
+  if (complete === recipients.length) {
+    dispatchStarted = true;
+    button.textContent = '✓ Certificates sent';
+    button.classList.add('sent');
+    showToast(`Dispatch complete. ${complete} certificate PDFs delivered.`);
+  } else {
+    button.disabled = false;
+    button.textContent = 'Retry delivery';
+    showToast(`${complete} of ${recipients.length} certificates delivered. Review and retry the rest.`);
+  }
 }
 
 document.querySelector('#recipient-search').addEventListener('input', event => renderRecipients(event.target.value));
