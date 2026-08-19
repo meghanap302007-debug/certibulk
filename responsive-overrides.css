@@ -25,6 +25,15 @@
 .qr-placeholder { position: absolute; right: 31px; bottom: 19px; opacity: 0; border: 1px solid currentColor; padding: 6px; font-size: 18px; transition: opacity .2s; }
 .qr-placeholder.visible { opacity: .75; }
 .signature-style { font-family: cursive; font-style: italic; }
+.modal-backdrop[hidden] { display: none; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 18px; background: rgba(16,47,45,.42); }
+.modal { width: min(420px, 100%); padding: 24px; box-shadow: 0 20px 60px rgba(16,47,45,.2); }
+.modal-heading { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 23px; }
+.modal-heading h2 { font: 600 20px 'Space Grotesk'; margin: 0; }
+.modal-close { color: var(--muted); font-size: 22px; }
+.modal label { display: block; color: #73827d; font-size: 11px; font-weight: 600; margin-bottom: 16px; }
+.modal label input { display: block; width: 100%; border: 1px solid var(--line); border-radius: 5px; padding: 11px; margin-top: 7px; font: 12px inherit; color: var(--ink); outline-color: var(--green); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
 
 @media (max-width: 700px) {
   .designer-layout { grid-template-columns: 1fr; }

@@ -129,10 +129,20 @@ document.querySelector('#csv-input').addEventListener('change', event => {
   };
   reader.readAsText(file);
 });
+const recipientModal = document.querySelector('#recipient-modal');
+function closeRecipientModal() {
+  recipientModal.hidden = true;
+}
 document.querySelector('#add-recipient').addEventListener('click', () => {
-  const name = window.prompt('Recipient name');
-  const email = window.prompt('Recipient email address');
-  if (!name || !email) return;
+  recipientModal.hidden = false;
+  document.querySelector('#new-recipient-name').focus();
+});
+document.querySelector('#close-recipient-modal').addEventListener('click', closeRecipientModal);
+document.querySelector('#cancel-recipient').addEventListener('click', closeRecipientModal);
+document.querySelector('#recipient-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const name = document.querySelector('#new-recipient-name').value.trim();
+  const email = document.querySelector('#new-recipient-email').value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showToast('Please enter a valid email address.');
     return;
@@ -144,6 +154,8 @@ document.querySelector('#add-recipient').addEventListener('click', () => {
   recipients.push({ name, email, id: `CERT-2026-${String(recipients.length + 1).padStart(5, '0')}`, initials: name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase() });
   renderRecipients(document.querySelector('#recipient-search').value);
   renderDispatch();
+  document.querySelector('#recipient-form').reset();
+  closeRecipientModal();
   showToast(`${name} added to the roster.`);
 });
 document.querySelector('#recipient-rows').addEventListener('click', event => {

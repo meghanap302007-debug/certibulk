@@ -62,6 +62,14 @@ Keep building,
 Arjun</textarea></label><div class="composer-footer"><span>Use <b>{{first_name}}</b> or <b>{{certificate_id}}</b> to personalize</span><span>Saved 2 min ago</span></div></div><div class="panel email-preview"><span class="summary-kicker">MOBILE PREVIEW</span><div class="phone"><div class="phone-notch"></div><div class="phone-header"><span>‹</span><b>Inbox</b><span>•••</span></div><div class="email-content"><div class="avatar big-avatar">JC</div><strong>JAIVA Creative Labs</strong><small>to Arjun Kumar · now</small><h3>Your certificate from JAIVA Creative Labs ✦</h3><p>Hi Arjun,<br><br>Congratulations on completing your internship with JAIVA Creative Labs. Your certificate is attached as a small record of the work you put in.</p><div class="attachment">▧ <span>Arjun-Kumar-CERT-26.pdf<small>PDF · 248 KB</small></span>↓</div></div></div></div></div></section>
     </main>
   </div>
+  <div class="modal-backdrop" id="recipient-modal" hidden>
+    <form class="modal panel" id="recipient-form">
+      <div class="modal-heading"><div><span class="summary-kicker">NEW RECIPIENT</span><h2>Add someone to this campaign</h2></div><button type="button" class="icon-button modal-close" id="close-recipient-modal" aria-label="Close">×</button></div>
+      <label>Full name<input id="new-recipient-name" required placeholder="e.g. Asha Rao"></label>
+      <label>Email address<input id="new-recipient-email" type="email" required placeholder="asha@example.com"></label>
+      <div class="modal-actions"><button type="button" class="outline-button" id="cancel-recipient">Cancel</button><button class="primary-button" type="submit">Add recipient</button></div>
+    </form>
+  </div>
   <div class="toast" id="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
