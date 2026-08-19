@@ -1,0 +1,7 @@
+{
+  "name": "CertiBulk Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+  "forwardPorts": [5500],
+  "postCreateCommand": "npm install",
+  "remoteUser": "vscode"
+}

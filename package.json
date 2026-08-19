@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "npx serve -s . -l 5500"
+    "start": "serve -s . -l 5500"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
 }
